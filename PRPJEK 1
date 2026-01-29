@@ -66,9 +66,10 @@ end
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- Variabel Zoom
+-- Variabel kamera
 local zoomDistance = 20
 local zoomHeight = 5
+local camRotation = 0 -- rotasi horizontal
 
 -- Update kamera setiap frame
 game:GetService("RunService").RenderStepped:Connect(function()
@@ -76,22 +77,24 @@ game:GetService("RunService").RenderStepped:Connect(function()
     if char and char:FindFirstChild("HumanoidRootPart") then
         local hrp = char.HumanoidRootPart
         camera.CameraType = Enum.CameraType.Scriptable
-        camera.CFrame = hrp.CFrame * CFrame.new(0, zoomHeight, zoomDistance)
+        -- posisi mundur + rotasi horizontal
+        local offset = CFrame.Angles(0, math.rad(camRotation), 0) * CFrame.new(0, zoomHeight, zoomDistance)
+        camera.CFrame = hrp.CFrame * offset
     end
 end)
 
--- Slider Zoom
+-- Slider untuk jarak Zoom
 CameraTab:Slider({
     Title = "Zoom Distance",
     Desc = "Atur seberapa jauh kamera dari karakter",
     Step = 1,
-    Value = {Min = 5, Max = 500, Default = 20}, -- Bisa sangat jauh
+    Value = {Min = 5, Max = 500, Default = 20},
     Callback = function(value)
         zoomDistance = value
     end
 })
 
--- Slider tinggi kamera (opsional)
+-- Slider untuk tinggi kamera
 CameraTab:Slider({
     Title = "Camera Height",
     Desc = "Tinggi kamera dari karakter",
@@ -99,5 +102,16 @@ CameraTab:Slider({
     Value = {Min = 0, Max = 200, Default = 5},
     Callback = function(value)
         zoomHeight = value
+    end
+})
+
+-- Slider untuk rotasi horizontal
+CameraTab:Slider({
+    Title = "Camera Rotate",
+    Desc = "Putar kamera ke samping",
+    Step = 1,
+    Value = {Min = -180, Max = 180, Default = 0},
+    Callback = function(value)
+        camRotation = value
     end
 })
