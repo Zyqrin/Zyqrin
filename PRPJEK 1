@@ -63,41 +63,23 @@ for _, tp in ipairs(teleportPoints) do
     })
 end
 
--- Camera zoom variables
+-- Ambil player dan camera
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
-local zoomDistance = 50 -- default jarak mundur
-local zoomHeight = 5 -- ketinggian kamera di atas karakter
 
--- Update camera setiap frame
-game:GetService("RunService").RenderStepped:Connect(function()
-    local char = player.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        local hrp = char.HumanoidRootPart
-        camera.CameraType = Enum.CameraType.Scriptable
-        camera.CFrame = hrp.CFrame * CFrame.new(0, zoomHeight, zoomDistance)
-        camera.CFrame = CFrame.new(camera.CFrame.Position, hrp.Position + Vector3.new(0, 2, 0))
-    end
-end)
-
--- Slider untuk atur jarak zoom
-ZoomTab:Slider({
-    Title = "Zoom Distance",
-    Desc = "Atur seberapa jauh kamera dari karakter",
-    Step = 1,
-    Value = {Min = 10, Max = 500, Default = 50}, -- Bisa sangat jauh
+-- Slider Zoom
+local Slider = Tab:Slider({
+    Title = "Camera Zoom",
+    Desc = "Atur jarak pandang kamera",
+    
+    Step = 1, -- langkah 1
+    Value = {
+        Min = 20,   -- zoom paling dekat
+        Max = 250,  -- zoom paling jauh
+        Default = 120, -- default camera FOV
+    },
+    
     Callback = function(value)
-        zoomDistance = value
-    end
-})
-
--- Slider untuk atur tinggi kamera
-ZoomTab:Slider({
-    Title = "Zoom Height",
-    Desc = "Atur ketinggian kamera dari karakter",
-    Step = 1,
-    Value = {Min = 0, Max = 100, Default = 5},
-    Callback = function(value)
-        zoomHeight = value
+        camera.FieldOfView = value
     end
 })
