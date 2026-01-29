@@ -83,7 +83,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end)
 
 -- Slider Zoom
-local Slider = Tab:Slider({
+local Slider = ZoomTab:Slider({
     Title = "Camera Zoom",
     Desc = "Atur jarak pandang kamera",
     Step = 1,
@@ -94,7 +94,7 @@ local Slider = Tab:Slider({
 })
 
 -- Slider untuk tinggi kamera (optional)
-local HeightSlider = Tab:Slider({
+local HeightSlider = ZoomTab:Slider({
     Title = "Camera Height",
     Desc = "Tinggi kamera dari karakter",
     Step = 1,
