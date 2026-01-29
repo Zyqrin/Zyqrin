@@ -27,7 +27,7 @@ local teleportPoints = {
     {Name = "TP 3", CFrame = CFrame.new(398.00, -2.77, 0.00)},
     {Name = "TP 4", CFrame = CFrame.new(542.00, -2.77, 0.00)},
     {Name = "TP 5", CFrame = CFrame.new(757.58, -2.77, -0.48)},
-    {Name = "TP 6", CFrame = CFrame.new(1083.59, -2.77, 3.12))},
+    {Name = "TP 6", CFrame = CFrame.new(1083.59, -2.77, 3.12)},
     {Name = "TP 7", CFrame = CFrame.new(1571.49, -2.77, 3.48)},
     {Name = "TP 8", CFrame = CFrame.new(2273.91, -2.77, 3.83)},
     {Name = "TP 9", CFrame = CFrame.new(2632.31, -2.77, 2.30)},
