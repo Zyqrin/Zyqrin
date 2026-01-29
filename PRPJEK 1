@@ -63,23 +63,108 @@ for _, tp in ipairs(teleportPoints) do
     })
 end
 
--- Ambil player dan camera
+-- Load WindUI
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+-- Window
+local Window = WindUI:CreateWindow({
+    Title = "My Super Hub",
+    Icon = "door-open",
+    Author = "by .ftgs and .ftgs",
+})
+
+-- Tab Teleport
+local TeleportTab = Window:Tab({
+    Title = "Teleport",
+    Icon = "navigation",
+    Locked = false,
+})
+
+-- Tab Zoom
+local ZoomTab = Window:Tab({
+    Title = "Camera",
+    Icon = "camera",
+    Locked = false,
+})
+
+-- Teleport Points
+local teleportPoints = {
+    {Name = "TP 1", CFrame = CFrame.new(206.39, -2.82, 24.40)},
+    {Name = "TP 2", CFrame = CFrame.new(747.84, 0.54, -51.73)},
+    {Name = "TP 3", CFrame = CFrame.new(402.01, -2.82, 14.84)},
+    {Name = "TP 4", CFrame = CFrame.new(547.18, -2.82, 16.71)},
+    {Name = "TP 5", CFrame = CFrame.new(758.57, -5.47, 15.28)},
+    {Name = "TP 6", CFrame = CFrame.new(1082.57, -2.82, 5.47)},
+    {Name = "TP 7", CFrame = CFrame.new(1553.39, -2.82, -14.61)},
+    {Name = "TP 8", CFrame = CFrame.new(2276.71, -2.82, -14.40)},
+    {Name = "TP 9", CFrame = CFrame.new(2602.92, -2.82, -2.50)},
+}
+
+-- Respawn-safe function
+local function getHRP()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    return character:WaitForChild("HumanoidRootPart")
+end
+
+-- Smooth teleport faster
+local function smoothTP(targetCFrame)
+    local hrp = getHRP()
+    local duration = 0.3
+    local steps = 40
+    local startCFrame = hrp.CFrame
+    for i = 1, steps do
+        hrp.CFrame = startCFrame:Lerp(targetCFrame, i/steps)
+        task.wait(duration/steps)
+    end
+end
+
+-- Create teleport buttons
+for _, tp in ipairs(teleportPoints) do
+    TeleportTab:Button({
+        Title = tp.Name,
+        Desc = "Teleport to "..tp.Name,
+        Callback = function()
+            smoothTP(tp.CFrame)
+        end
+    })
+end
+
+-- Camera zoom variables
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
+local zoomDistance = 50 -- default jarak mundur
+local zoomHeight = 5 -- ketinggian kamera di atas karakter
 
--- Slider Zoom
-local Slider = ZoomTab:Slider({
-    Title = "Camera Zoom",
-    Desc = "Atur jarak pandang kamera",
-    
-    Step = 1, -- langkah 1
-    Value = {
-        Min = 20,   -- zoom paling dekat
-        Max = 1000,  -- zoom paling jauh
-        Default = 70, -- default camera FOV
-    },
-    
+-- Update camera setiap frame
+game:GetService("RunService").RenderStepped:Connect(function()
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local hrp = char.HumanoidRootPart
+        camera.CameraType = Enum.CameraType.Scriptable
+        camera.CFrame = hrp.CFrame * CFrame.new(0, zoomHeight, zoomDistance)
+        camera.CFrame = CFrame.new(camera.CFrame.Position, hrp.Position + Vector3.new(0, 2, 0))
+    end
+end)
+
+-- Slider untuk atur jarak zoom
+ZoomTab:Slider({
+    Title = "Zoom Distance",
+    Desc = "Atur seberapa jauh kamera dari karakter",
+    Step = 1,
+    Value = {Min = 10, Max = 500, Default = 50}, -- Bisa sangat jauh
     Callback = function(value)
-        camera.FieldOfView = value
+        zoomDistance = value
+    end
+})
+
+-- Slider untuk atur tinggi kamera
+ZoomTab:Slider({
+    Title = "Zoom Height",
+    Desc = "Atur ketinggian kamera dari karakter",
+    Step = 1,
+    Value = {Min = 0, Max = 100, Default = 5},
+    Callback = function(value)
+        zoomHeight = value
     end
 })
