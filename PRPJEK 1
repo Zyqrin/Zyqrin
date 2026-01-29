@@ -75,7 +75,7 @@ local Slider = ZoomTab:Slider({
     Step = 1, -- langkah 1
     Value = {
         Min = 20,   -- zoom paling dekat
-        Max = 500,  -- zoom paling jauh
+        Max = 1000,  -- zoom paling jauh
         Default = 70, -- default camera FOV
     },
     
