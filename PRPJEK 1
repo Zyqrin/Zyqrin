@@ -15,7 +15,7 @@ local TeleportTab = Window:Tab({
     Locked = false,
 })
 
-local CameraTab = Window:Tab({
+local CamTab = Window:Tab({
     Title = "Zoom",
     Icon = "navigation",
     Locked = false,
@@ -62,27 +62,37 @@ for _, tp in ipairs(teleportPoints) do
         end
     })
 end
-local player = game.Players.LocalPlayer
+
+-- Buat Section Zoom Toggle
+local Section = CamTab:Section({
+    Title = "Zoom Toggle"
+})
 
 -- Default dan Max Zoom
+local player = game.Players.LocalPlayer
 local DefaultZoom = 128
 local MaxZoom = 5000
 
--- Section Zoom Toggle
-Section:SetTitle("Zoom Toggle")
-
 -- Toggle Zoom Jauh
-CameraTab:Toggle({
+local Toggle = Section:Toggle({
     Title = "Zoom Jauh",
     Desc = "Aktifkan untuk Zoom sangat jauh",
-    Locked = false,
-    Callback = function(value)
-        if value then
+    Icon = "bird",
+    Type = "Checkbox",
+    Value = false, -- default value
+    Callback = function(state)
+        if state then
             player.CameraMaxZoomDistance = MaxZoom
             player.CameraMinZoomDistance = 0
+            player.CameraMode = Enum.CameraType.Custom -- pastikan Custom
         else
             player.CameraMaxZoomDistance = DefaultZoom
             player.CameraMinZoomDistance = 0
+            player.CameraMode = Enum.CameraType.Custom
         end
+        print("Zoom Toggle Activated: " .. tostring(state))
     end
 })
+
+-- Contoh update judul Section
+Section:SetTitle("Zoom Jauh Toggle")
