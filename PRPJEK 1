@@ -69,10 +69,10 @@ local DefaultZoom = 128
 local MaxZoom = 5000
 
 -- Section Zoom Toggle
-CamTab:Label({Title = "Zoom Toggle"})
+CameraTab:Label({Title = "Zoom Toggle"})
 
 -- Toggle Zoom Jauh
-CamTab:Toggle({
+CameraTab:Toggle({
     Title = "Zoom Jauh",
     Desc = "Aktifkan untuk Zoom sangat jauh",
     Locked = false,
