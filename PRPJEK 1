@@ -88,7 +88,7 @@ CameraTab:Slider({
     Title = "Zoom Distance",
     Desc = "Atur seberapa jauh kamera dari karakter",
     Step = 1,
-    Value = {Min = 5, Max = 500, Default = 20},
+    Value = {Min = 5, Max = 2000, Default = 20},
     Callback = function(value)
         zoomDistance = value
     end
@@ -99,7 +99,7 @@ CameraTab:Slider({
     Title = "Camera Height",
     Desc = "Tinggi kamera dari karakter",
     Step = 1,
-    Value = {Min = 0, Max = 200, Default = 5},
+    Value = {Min = 0, Max = 500, Default = 5},
     Callback = function(value)
         zoomHeight = value
     end
