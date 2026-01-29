@@ -63,23 +63,22 @@ for _, tp in ipairs(teleportPoints) do
     })
 end
 
--- Ambil player dan camera
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
 -- Slider Zoom
-local Slider = ZoomTab:Slider({
+local Slider = Tab:Slider({
     Title = "Camera Zoom",
     Desc = "Atur jarak pandang kamera",
-    
-    Step = 1, -- langkah 1
-    Value = {
-        Min = 20,   -- zoom paling dekat
-        Max = 250,  -- zoom paling jauh
-        Default = 120, -- default camera FOV
-    },
-    
+    Step = 1,
+    Value = {Min = 5, Max = 50, Default = 20}, -- jarak mundur
     Callback = function(value)
-        camera.FieldOfView = value
+        local char = player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            camera.CameraType = Enum.CameraType.Custom
+            -- posisi mundur di belakang karakter
+            local hrp = char.HumanoidRootPart
+            camera.CFrame = hrp.CFrame * CFrame.new(0, 2, value) -- X,Y,Z
+        end
     end
 })
