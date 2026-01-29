@@ -1,100 +1,85 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({
-   Name = "ETFB || Zyqrin HuB",
-   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "Zyqrin Hub",
-   LoadingSubtitle = "by Zyqrin",
-   ShowText = "Zyqrin", -- for mobile users to unhide rayfield, change if you'd like
-   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+-- Load WindUI
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
-   ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
-
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
-
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "Big Hub"
-   },
-
-   Discord = {
-      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
-      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
-   },
-
-   KeySystem = false, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "Untitled",
-      Subtitle = "Key System",
-      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
-      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
-      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
-   }
+-- Buat Window
+local Window = WindUI:CreateWindow({
+    Title = "My Super Hub",
+    Icon = "door-open",
+    Author = "by .ftgs and .ftgs",
 })
 
-local Tab = Window:CreateTab("Main", 4483362458) -- Title, Image
+-- Buat TpTab Teleport
+local TeleportTab = Window:Tab({
+    Title = "Teleport",
+    Icon = "navigation",
+    Locked = false,
+})
 
--- === Menu Auto Clicker ===
+local ZoomTab = Window:Tab({
+    Title = "Zoom",
+    Icon = "navigation",
+    Locked = false,
+})
+-- Daftar koordinat teleport
+local teleportPoints = {
+    {Name = "TP 1", CFrame = CFrame.new(206.39, -2.82, 24.40)},
+    {Name = "TP 2", CFrame = CFrame.new(747.84, 0.54, -51.73)},
+    {Name = "TP 3", CFrame = CFrame.new(402.01, -2.82, 14.84)},
+    {Name = "TP 4", CFrame = CFrame.new(547.18, -2.82, 16.71)},
+    {Name = "TP 5", CFrame = CFrame.new(758.57, -5.47, 15.28)},
+    {Name = "TP 6", CFrame = CFrame.new(1082.57, -2.82, 5.47)},
+    {Name = "TP 7", CFrame = CFrame.new(1553.39, -2.82, -14.61)},
+    {Name = "TP 8", CFrame = CFrame.new(2276.71, -2.82, -14.40)},
+    {Name = "TP 9", CFrame = CFrame.new(2602.92, -2.82, -2.50)},
+}
 
--- Auto Click Toggle (loop otomatis)
-local AutoClickToggle = Tab:CreateToggle({
-    Name = "Auto Click (Loop)",
-    CurrentValue = false,
-    Flag = "AutoClickLoop",
-    Callback = function(Value)
-        _G.AutoClickLoop = Value
-        if Value then
-            spawn(function()
-                while _G.AutoClickLoop do
-                    local success, err = pcall(function()
-                        local remoteFolder = game:GetService("ReplicatedStorage")["f3b27cfa-9232-4c6f-bbeb-ebd78438fcab"]
-                        remoteFolder.Events["ClickEvent"]:FireServer(true,true,false) -- Auto click
-                    end)
-                    if not success then warn("Auto Click Error: "..err) end
-                    wait(0.05) -- kecepatan klik
-                end
-            end)
+-- Fungsi untuk ambil HumanoidRootPart, termasuk setelah respawn
+local function getHRP()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    return character:WaitForChild("HumanoidRootPart")
+end
+
+-- Fungsi teleport halus lebih cepat
+local function smoothTP(targetCFrame)
+    local hrp = getHRP() -- ambil HRP terbaru
+    local duration = 0.4 -- lebih cepat dari sebelumnya
+    local steps = 40
+    local startCFrame = hrp.CFrame
+    for i = 1, steps do
+        hrp.CFrame = startCFrame:Lerp(targetCFrame, i/steps)
+        task.wait(duration/steps)
+    end
+end
+
+-- Buat tombol untuk setiap koordinat
+for _, tp in ipairs(teleportPoints) do
+    TeleportTab:Button({
+        Title = tp.Name,
+        Desc = "Teleport to "..tp.Name,
+        Callback = function()
+            smoothTP(tp.CFrame)
         end
-    end,
-})
+    })
+end
 
--- Manual Click Loop Toggle (klik 5x terus menerus jika toggle ON)
-local ManualLoopToggle = Tab:CreateToggle({
-    Name = "Manual Click 5x (Loop)",
-    CurrentValue = false,
-    Flag = "ManualClickLoop",
-    Callback = function(Value)
-        _G.ManualClickLoop = Value
-        if Value then
-            spawn(function()
-                while _G.ManualClickLoop do
-                    for i = 1, 5 do
-                        local success, err = pcall(function()
-                            local remoteFolder = game:GetService("ReplicatedStorage")["f3b27cfa-9232-4c6f-bbeb-ebd78438fcab"]
-                            remoteFolder.Events["ClickEvent"]:FireServer(true,false) -- Manual click
-                        end)
-                        if not success then warn("Manual Click Error: "..err) end
-                        wait(0.05)
-                    end
-                    wait(0.1) -- delay antar loop
-                end
-            end)
-        end
-    end,
-})
+-- Ambil player dan camera
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
 
--- Manual Click 1x Button
-local ManualButton = Tab:CreateButton({
-    Name = "Manual Click 1x",
-    Callback = function()
-        local success, err = pcall(function()
-            local remoteFolder = game:GetService("ReplicatedStorage")["f3b27cfa-9232-4c6f-bbeb-ebd78438fcab"]
-            remoteFolder.Events["ClickEvent"]:FireServer(true,false)
-        end)
-        if not success then warn("Manual Click Error: "..err) end
+-- Slider Zoom
+local Slider = ZoomTab:Slider({
+    Title = "Camera Zoom",
+    Desc = "Atur jarak pandang kamera",
+    
+    Step = 1, -- langkah 1
+    Value = {
+        Min = 20,   -- zoom paling dekat
+        Max = 120,  -- zoom paling jauh
+        Default = 70, -- default camera FOV
+    },
+    
+    Callback = function(value)
+        camera.FieldOfView = value
     end
 })
