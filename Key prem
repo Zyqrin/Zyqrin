@@ -1,0 +1,26 @@
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+-- DATABASE KEY (BUATAN KAMU)
+local Keys = {
+    [123456789] = "Yosbt68iayg7", -- UserId : Key
+    [987654321] = "ABCD-9999",
+    [555666777] = "FTGS-PRIVATE"
+}
+
+-- cek apakah user terdaftar
+local correct_key = Keys[lp.UserId]
+
+if not correct_key then
+    lp:Kick("Akun tidak terdaftar")
+    return
+end
+
+-- cek key
+if script_key ~= correct_key then
+    lp:Kick("Key salah untuk akun ini")
+    return
+end
+
+-- LOLOS → EXECUTE
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zyqrinhub01/Zyqrin-Hub/refs/heads/main/Zyqrin%20Projek%201"))()
