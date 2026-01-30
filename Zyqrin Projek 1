@@ -18,28 +18,56 @@ local Window = WindUI:CreateWindow({
     }
 })
 
-local Dialog = Window:Dialog({
-    Icon = "bird",
-    Title = "Dialog Title",
-    Content = "Content Text",
-    Buttons = {
-        {
-            Title = "Confirm",
-            Callback = function()
-                print("Confirmed!")
-            end,
-        },
-        {
-            Title = "Cancel",
-            Callback = function()
-                print("Cancelled!")
-            end,
-        },
-    },
-})
-
-local Tab = Window:Tab({
+local InfoTab = Window:Tab({
     Title = "Tab Title",
     Icon = "bird", -- optional
     Locked = false,
+})
+
+InfoTab:Section({
+    Title = "Zyqrin Hub"
+})
+
+InfoTab:Label({
+    Title = "Version",
+    Content = "v1.2.0"
+})
+
+InfoTab:Label({
+    Title = "Status",
+    Content = "Active"
+})
+
+InfoTab:Label({
+    Title = "Type",
+    Content = "Private Script"
+})
+
+InfoTab:Section({
+    Title = "Features"
+})
+
+InfoTab:Label({
+    Title = "Available",
+    Content = "• Auto Collect Base\n• Auto Upgrade\n• Anti AFK\n• Key + HWID System"
+})
+local ChangelogTab = Window:Tab({
+    Title = "Changelog",
+    Icon = "scroll"
+})
+
+ChangelogTab:Label({
+    Title = "v1.2.0",
+    Content = "• Fix auto collect\n• Improve base detection"
+})
+
+ChangelogTab:Label({
+    Title = "v1.1.0",
+    Content = "• UI WindUI\n• Key system added"
+})
+InfoTab:Button({
+    Title = "Join Discord",
+    Callback = function()
+        setclipboard("https://discord.gg/zyqrin")
+    end
 })
