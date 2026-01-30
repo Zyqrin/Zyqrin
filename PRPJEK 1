@@ -1,98 +1,12 @@
--- Load WindUI
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-
--- Buat Window
 local Window = WindUI:CreateWindow({
-    Title = "Zyqrin Hub",
-    Icon = "door-open",
-    Author = "by .ftgs and .ftgs",
+    Title = "My Super Hub",
+    Icon = "door-open", -- lucide icon. optional
+    Author = "by .ftgs and .ftgs", -- optional
 })
 
--- Buat TpTab Teleport
-local TeleportTab = Window:Tab({
-    Title = "Teleport",
-    Icon = "navigation",
+local Tab = Window:Tab({
+    Title = "Tab Title",
+    Icon = "bird", -- optional
     Locked = false,
 })
-
-local CamTab = Window:Tab({
-    Title = "Zoom",
-    Icon = "navigation",
-    Locked = false,
-})
--- Daftar koordinat teleport
-local teleportPoints = {
-    {Name = "TP 1", CFrame = CFrame.new(200.00, -2.77, 0.00)},
-    {Name = "TP 2", CFrame = CFrame.new(284.00, -2.77, 0.00)},
-    {Name = "TP 3", CFrame = CFrame.new(398.00, -2.77, 0.00)},
-    {Name = "TP 4", CFrame = CFrame.new(542.00, -2.77, 0.00)},
-    {Name = "TP 5", CFrame = CFrame.new(757.58, -2.77, -0.48)},
-    {Name = "TP 6", CFrame = CFrame.new(1083.59, -2.77, 3.12)},
-    {Name = "TP 7", CFrame = CFrame.new(1571.49, -2.77, 3.48)},
-    {Name = "TP 8", CFrame = CFrame.new(2273.91, -2.77, 3.83)},
-    {Name = "TP 9", CFrame = CFrame.new(2632.31, -2.77, 2.30)},
-}
-
--- Fungsi untuk ambil HumanoidRootPart, termasuk setelah respawn
-local function getHRP()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    return character:WaitForChild("HumanoidRootPart")
-end
-
--- Fungsi teleport halus lebih cepat
-local function smoothTP(targetCFrame)
-    local hrp = getHRP() -- ambil HRP terbaru
-    local duration = 0.4 -- lebih cepat dari sebelumnya
-    local steps = 40
-    local startCFrame = hrp.CFrame
-    for i = 1, steps do
-        hrp.CFrame = startCFrame:Lerp(targetCFrame, i/steps)
-        task.wait(duration/steps)
-    end
-end
-
--- Buat tombol untuk setiap koordinat
-for _, tp in ipairs(teleportPoints) do
-    TeleportTab:Button({
-        Title = tp.Name,
-        Desc = "Teleport to "..tp.Name,
-        Callback = function()
-            smoothTP(tp.CFrame)
-        end
-    })
-end
-
--- Buat Section Zoom Toggle
-local Section = CamTab:Section({
-    Title = "Zoom Toggle"
-})
-
--- Default dan Max Zoom
-local player = game.Players.LocalPlayer
-local DefaultZoom = 128
-local MaxZoom = 5000
-
--- Toggle Zoom Jauh
-local Toggle = Section:Toggle({
-    Title = "Zoom Jauh",
-    Desc = "Aktifkan untuk Zoom sangat jauh",
-    Icon = "bird",
-    Type = "Checkbox",
-    Value = false, -- default value
-    Callback = function(state)
-        if state then
-            player.CameraMaxZoomDistance = MaxZoom
-            player.CameraMinZoomDistance = 0
-            player.CameraMode = Enum.CameraType.Custom -- pastikan Custom
-        else
-            player.CameraMaxZoomDistance = DefaultZoom
-            player.CameraMinZoomDistance = 0
-            player.CameraMode = Enum.CameraType.Custom
-        end
-        print("Zoom Toggle Activated: " .. tostring(state))
-    end
-})
-
--- Contoh update judul Section
-Section:SetTitle("Zoom Jauh Toggle")
