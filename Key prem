@@ -1,5 +1,5 @@
 -- =========================
--- ZYQRIN HUB | KEY SYSTEM
+-- ZYQRIN HUB - KEY LOADER
 -- =========================
 
 local Players = game:GetService("Players")
@@ -12,37 +12,35 @@ local lp = Players.LocalPlayer
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1466699917182505117/9XPjE97XF7g1TeB_9PTsuM5WpLcJktRSnua6SZH9hPcGjrLQJiY5QGtK1Rvc3ra10DOi"
 
 -- =========================
--- DATABASE KEY (TANPA USERID)
+-- DATABASE KEY → USERID
 -- =========================
-local ValidKeys = {
-    "Yosbt68iayg7",
-    "ABCD-9999",
-    "FTGS-PRIVATE"
+local Keys = {
+    ["Yosbt68iayg7"] = 7143094900, -- GANTI DENGAN USERID KAMU
+    -- ["KEY_LAIN"] = USERID,
 }
 
 -- =========================
--- CEK KEY
+-- VALIDASI KEY
 -- =========================
 if not script_key then
     lp:Kick("Key tidak ditemukan")
     return
 end
 
-local keyValid = false
-for _, key in ipairs(ValidKeys) do
-    if script_key == key then
-        keyValid = true
-        break
-    end
+local allowedUserId = Keys[script_key]
+
+if not allowedUserId then
+    lp:Kick("Key tidak terdaftar")
+    return
 end
 
-if not keyValid then
-    lp:Kick("Key tidak valid")
+if lp.UserId ~= allowedUserId then
+    lp:Kick("Key ini bukan untuk akun kamu")
     return
 end
 
 -- =========================
--- DETEKSI USER (LOG)
+-- LOG LOGIN (CONSOLE)
 -- =========================
 print("===== ZYQRIN HUB LOGIN =====")
 print("Username :", lp.Name)
@@ -51,21 +49,21 @@ print("Key      :", script_key)
 print("Time     :", os.date("%d-%m-%Y %H:%M:%S"))
 
 -- =========================
--- KIRIM KE DISCORD
+-- LOG LOGIN (DISCORD)
 -- =========================
 pcall(function()
     local data = {
         embeds = {{
-            title = "🔑 ZYQRIN HUB | KEY USED",
+            title = "🔑 ZYQRIN HUB | KEY LOGIN",
             color = 65280,
             fields = {
                 { name = "Username", value = lp.Name, inline = true },
                 { name = "UserId", value = tostring(lp.UserId), inline = true },
                 { name = "Key", value = script_key, inline = false },
-                { name = "Time", value = os.date("%d-%m-%Y %H:%M:%S"), inline = false }
+                { name = "Executor Time", value = os.date("%d-%m-%Y %H:%M:%S"), inline = false }
             },
             footer = {
-                text = "Zyqrin Hub • Key Detection"
+                text = "Zyqrin Hub • Key System"
             }
         }}
     }
