@@ -41,12 +41,11 @@ local Window = Rayfield:CreateWindow({
 
 --Values
 _G.AutoHit = true
-_G.PilihBlox = "Basic Block"
 
 --Functions
 function AutoHit()
  while _G.AutoHit == true do
-game:GetService("ReplicatedStorage").Remotes.DamageBlockEvent:FireServer(_G.PilihBlox,5)
+ game:GetService("ReplicatedStorage").Paper.Remotes.__remoteevent:FireServer("Mine","MP",)
     end
 end
 
@@ -63,14 +62,3 @@ local Toggle = FarmTab:CreateToggle({
    end,
 })
 
-local Dropdown = FarmTab:CreateDropdown({
-   Name = "Pilih",
-   Options = {"Basic Block","Option 2"},
-   CurrentOption = {"Basic Block"},
-   MultipleOptions = true,
-   Flag = "Dropdown1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-   Callback = function(Options)
-     _G.PilihBlox = Value
-     print(_G.PilihBlox)
-   end,
-})
