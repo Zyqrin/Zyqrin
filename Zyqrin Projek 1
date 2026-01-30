@@ -24,20 +24,27 @@ local InfoTab = Window:Tab({
     Locked = false,
 })
 
+local discordInvite = "https://discord.gg/INVITE_KAMU"
+
 local Paragraph = InfoTab:Paragraph({
     Title = "Paragraph with Image, Thumbnail, Buttons",
-    Desc = "Test Paragraph",
+    Desc = "Join Discord untuk info & update script",
     Color = "Red",
-    Image = "",
-    ImageSize = 30,
-    Thumbnail = "",
-    ThumbnailSize = 80,
-    Locked = false,
     Buttons = {
         {
             Icon = "bird",
-            Title = "Button",
-            Callback = function() print("1 Button") end,
+            Title = "Join Discord",
+            Callback = function()
+                if setclipboard then
+                    setclipboard(discordInvite)
+                end
+
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "Discord",
+                    Text = "Link Discord disalin ke clipboard!",
+                    Duration = 5
+                })
+            end,
         }
     }
 })
