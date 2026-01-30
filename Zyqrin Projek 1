@@ -20,7 +20,7 @@ local Window = WindUI:CreateWindow({
 
 local InfoTab = Window:Tab({
     Title = "Tab Title",
-    Icon = "lucide:information", -- optional
+    Icon = "lucide:info", -- optional
     Locked = false,
 })
 
