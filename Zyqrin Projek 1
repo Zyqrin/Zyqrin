@@ -1,21 +1,23 @@
-local WindUI = loadstring(game:HttpGet(
-    "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
-))()
 
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
     Title = "My Super Hub",
-    Icon = "door-open",
-    Author = "by .ftgs and .ftgs",
-    Folder = "MySuperHub",
+    Icon = "door-open", -- lucide icon. optional
+    Author = "by .ftgs and .ftgs", -- optional
+})
 
-    Size = UDim2.fromOffset(580, 460),
-    Transparent = true,
-    Theme = "Drak",
-
-    User = {
-        Enabled = true,
-        Anonymous = true,
-    }
+local Window = WindUI:CreateWindow({
+    -- ...
+    
+    KeySystem = {                                                   
+        Note = "Example Key System. With pandadevelopment.",        
+        API = {                                                     
+            { -- pandadevelopment
+                Type = "pandadevelopment", -- type
+                ServiceId = "zyqrin", -- service id
+            },                                                      
+        },                                                          
+    },                                                              
 })
 
 local InfoTab = Window:Tab({
