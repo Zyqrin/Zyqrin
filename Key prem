@@ -1,31 +1,10 @@
--- =========================
--- ZYQRIN HUB - KEY LOADER
--- =========================
-
 local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
 local lp = Players.LocalPlayer
 
--- =========================
--- DISCORD WEBHOOK
--- =========================
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1466699917182505117/9XPjE97XF7g1TeB_9PTsuM5WpLcJktRSnua6SZH9hPcGjrLQJiY5QGtK1Rvc3ra10DOi"
-
--- =========================
--- DATABASE KEY → USERID
--- =========================
 local Keys = {
-    ["Yosbt68iayg7"] = 7143094900, -- GANTI DENGAN USERID KAMU
-    -- ["KEY_LAIN"] = USERID,
+    ["Yosbt68iayg7"] = 7143094900,
+    ["ABCD-9999"] = 987654321
 }
-
--- =========================
--- VALIDASI KEY
--- =========================
-if not script_key then
-    lp:Kick("Key tidak ditemukan")
-    return
-end
 
 local allowedUserId = Keys[script_key]
 
@@ -39,44 +18,12 @@ if lp.UserId ~= allowedUserId then
     return
 end
 
--- =========================
--- LOG LOGIN (CONSOLE)
--- =========================
-print("===== ZYQRIN HUB LOGIN =====")
-print("Username :", lp.Name)
-print("UserId   :", lp.UserId)
-print("Key      :", script_key)
-print("Time     :", os.date("%d-%m-%Y %H:%M:%S"))
+-- ✅ DETEKSI LOGIN
+print("LOGIN KEY VALID")
+print("Username:", lp.Name)
+print("UserId:", lp.UserId)
+print("Key:", script_key)
 
--- =========================
--- LOG LOGIN (DISCORD)
--- =========================
-pcall(function()
-    local data = {
-        embeds = {{
-            title = "🔑 ZYQRIN HUB | KEY LOGIN",
-            color = 65280,
-            fields = {
-                { name = "Username", value = lp.Name, inline = true },
-                { name = "UserId", value = tostring(lp.UserId), inline = true },
-                { name = "Key", value = script_key, inline = false },
-                { name = "Executor Time", value = os.date("%d-%m-%Y %H:%M:%S"), inline = false }
-            },
-            footer = {
-                text = "Zyqrin Hub • Key System"
-            }
-        }}
-    }
-
-    HttpService:PostAsync(
-        WEBHOOK_URL,
-        HttpService:JSONEncode(data)
-    )
-end)
-
--- =========================
--- LOAD SCRIPT UTAMA
--- =========================
 loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/USERNAME/REPO/main/main.luau"
+    "https://raw.githubusercontent.com/zyqrinhub01/Zyqrin-Hub/main/Zyqrin%20Projek%201"
 ))()
