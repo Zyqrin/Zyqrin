@@ -24,50 +24,20 @@ local InfoTab = Window:Tab({
     Locked = false,
 })
 
-InfoTab:Section({
-    Title = "Zyqrin Hub"
-})
-
-InfoTab:Label({
-    Title = "Version",
-    Content = "v1.2.0"
-})
-
-InfoTab:Label({
-    Title = "Status",
-    Content = "Active"
-})
-
-InfoTab:Label({
-    Title = "Type",
-    Content = "Private Script"
-})
-
-InfoTab:Section({
-    Title = "Features"
-})
-
-InfoTab:Label({
-    Title = "Available",
-    Content = "• Auto Collect Base\n• Auto Upgrade\n• Anti AFK\n• Key + HWID System"
-})
-local ChangelogTab = Window:Tab({
-    Title = "Changelog",
-    Icon = "scroll"
-})
-
-ChangelogTab:Label({
-    Title = "v1.2.0",
-    Content = "• Fix auto collect\n• Improve base detection"
-})
-
-ChangelogTab:Label({
-    Title = "v1.1.0",
-    Content = "• UI WindUI\n• Key system added"
-})
-InfoTab:Button({
-    Title = "Join Discord",
-    Callback = function()
-        setclipboard("https://discord.gg/zyqrin")
-    end
+local Paragraph = InfoTab:Paragraph({
+    Title = "Paragraph with Image, Thumbnail, Buttons",
+    Desc = "Test Paragraph",
+    Color = "Red",
+    Image = "",
+    ImageSize = 30,
+    Thumbnail = "",
+    ThumbnailSize = 80,
+    Locked = false,
+    Buttons = {
+        {
+            Icon = "bird",
+            Title = "Button",
+            Callback = function() print("1 Button") end,
+        }
+    }
 })
