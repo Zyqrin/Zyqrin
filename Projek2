@@ -89,6 +89,39 @@ local Toggle = Tab:Toggle({
 })
 
 
+-- ===== VARIABLES =====
+local AutoSellInstant = false
+
+-- ===== FUNCTION SELL =====
+local function SellAll()
+    pcall(function()
+        Net["RF/SellAllItems"]:InvokeServer()
+    end)
+end
+
+Tab:Space()
+
+-- ===== TOGGLE AUTO SELL INSTANT =====
+Tab:Toggle({
+    Title = "Auto Sell Instan",
+    Desc = "Sell All Instan",
+    Icon = "zap",
+    Value = false,
+    Callback = function(state)
+        AutoSellInstant = state
+
+        if state then
+            task.spawn(function()
+                while AutoSellInstant do
+                    SellAll()
+                    task.wait(0.5)
+                end
+            end)
+        end
+    end
+})
+
+
 -- Tab
 local Tab = Window:Tab({
     Title = "Teleport",
