@@ -98,6 +98,16 @@ local locations = {
     ["Ancient Jungle"] = Vector3.new(1273.0, 7.8, -189.9),
     ["Ancient Jungle Outside"] = Vector3.new(1595.4, 6.6, -367.3),
     ["Ancient Ruin"] = Vector3.new(6089.1, -585.9, 4631.2),
+    ["Coral Reefs"] = Vector3.new(-3022.1, 2.5, 2258.4),
+    ["Crater Island Ground"] = Vector3.new(1079.6, 3.6, 5080.4),
+    ["Crystal Depths"] = Vector3.new(5637.0, -905.0, 15354.0),
+    ["Crystaline Pessage"] = Vector3.new(6051.0, -538.9, 4386.0),
+    ["Esoteric Deep"] = Vector3.new(3267.6, -1300.7, 1383.6),
+    ["Kohana"] = Vector3.new(-367.8, 6.7, 521.9),
+    ["Kohana Volcano"] = Vector3.new(-422.0, 7.2, 129.0),
+    ["Leviathan Den"] = Vector3.new(3473.0, -287.8, 3472.0),
+    ["Pirate Cove"] = Vector3.new(3399.0, 2.7, 3469.0),
+    ["Pirate Treasure Room"] = Vector3.new(3309.0, -303.1, 3030.0),
 }
 
 local selectedLocation = "Spawn"
@@ -106,7 +116,7 @@ local selectedLocation = "Spawn"
 local Dropdown = Tab:Dropdown({
     Title = "Pilih Lokasi",
     Desc = "Pilih lokasi untuk teleport",
-    Values = {"Spawn", "Ancient Jungle", "Ancient Jungle Outside", "Ancient Ruin"}, -- semua nama lokasi
+    Values = {"Spawn", "Ancient Jungle", "Ancient Jungle Outside", "Ancient Ruin","Coral Reefs","Crater Island Ground","Crystal Depths","Crystaline Pessage","Esoteric Deep","Kohana","Kohana Volcano","Leviathan Den","Pirate Cove","Pirate Treasure Room"}, -- semua nama lokasi
     Value = "Spawn", -- default
     Multi = false, -- hanya satu pilihan
     Callback = function(option)
