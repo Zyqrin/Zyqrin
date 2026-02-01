@@ -1,0 +1,74 @@
+-- ===== LOAD TURTLE-LIB =====
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Turtle-Brand/Turtle-Lib/main/source.lua"))()
+local window = library:Window("Coordinate Teleporter")
+
+-- ===== LABEL CREDITS =====
+window:Label("Credits to Intrer#0421", Color3.fromRGB(127, 143, 166))
+
+-- ===== LABEL KOORDINAT PLAYER REAL-TIME =====
+local playerCoordLabel = window:Label("Player Coordinates: X=0 | Y=0 | Z=0", Color3.fromRGB(255, 255, 255))
+
+-- ===== BUTTON COPY KOORDINAT PLAYER =====
+window:Button("Copy Player Coordinates", function()
+    local character = game.Players.LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local pos = character.HumanoidRootPart.Position
+        local coordString = string.format("X=%.1f, Y=%.1f, Z=%.1f", pos.X, pos.Y, pos.Z)
+        setclipboard(coordString)
+        print("Player coordinates copied:", coordString)
+    end
+end)
+
+-- ===== TEXTBOX UNTUK KOORDINAT SATU BARIS =====
+local inputCoords = ""
+local inputBox = window:Box("Enter Coordinates (X,Y,Z)", function(text, focuslost)
+    inputCoords = text -- simpan input
+end)
+
+-- ===== BUTTON TELEPORT / SET POSISI KOORDINAT =====
+window:Button("Teleport to Coordinates", function()
+    if inputCoords == "" then
+        warn("Please enter coordinates first!")
+        return
+    end
+
+    local cleanText = inputCoords:gsub("%s","")
+    local parts = {}
+    for num in string.gmatch(cleanText, "[%d%.%-]+") do
+        table.insert(parts, tonumber(num))
+    end
+
+    if #parts == 3 then
+        local x, y, z = parts[1], parts[2], parts[3]
+        local character = game.Players.LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
+            print(string.format("Teleported to: X=%.1f, Y=%.1f, Z=%.1f", x, y, z))
+        end
+    else
+        warn("Invalid coordinates format! Use: X,Y,Z (e.g., 124.5,3.5,2757.2)")
+    end
+end)
+
+-- ===== BUTTON RESET KOORDINAT =====
+window:Button("Reset Coordinates", function()
+    inputCoords = ""
+    inputBox:SetText("") -- kosongkan TextBox
+    print("Coordinates input reset")
+end)
+
+-- ===== UPDATE KOORDINAT PLAYER REAL-TIME =====
+local RunService = game:GetService("RunService")
+local Player = game:GetService("Players").LocalPlayer
+
+RunService.RenderStepped:Connect(function()
+    local character = Player.Character
+    if character then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local pos = hrp.Position
+            playerCoordLabel:SetText(string.format("Player Coordinates: X=%.1f | Y=%.1f | Z=%.1f", pos.X, pos.Y, pos.Z))
+        end
+    end
+end)
+
