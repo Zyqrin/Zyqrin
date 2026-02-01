@@ -3,19 +3,26 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Zyqrin Hub",
-    Icon = "fish",
-    Author = "by Wisnu",
+    Icon = "rbxassetid://104014041555704",
+    Author = "by zyqrin",
 })
 
 local Tab = Window:Tab({
     Title = "Main",
-    Icon = "bird",
+    Icon = "fish",
     Locked = false,
 })
 
 -- ===== VARIABLES =====
 local RS = game:GetService("ReplicatedStorage")
 local Net = RS.Packages._Index["sleitnick_net@0.2.0"].net
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats").Network
+local TeleportService = game:GetService("TeleportService")
+local LocalPlayer = Players.LocalPlayer
+local PlaceId = 121864768012064 -- Fish It
 
 local AutoFishing = false
 local PullDelay = 0.5
@@ -23,8 +30,7 @@ local ResetDelay = .0
 
 -- ===== INPUT BOXES =====
 local PullInput = Tab:Input({
-    Title = "Pull Delay (Bite Time)",
-    Desc = "Delay sebelum fish ditarik",
+    Title = "Pull Delay",
     Value = tostring(PullDelay),
     InputIcon = "clock",
     Type = "Input",
@@ -35,8 +41,7 @@ local PullInput = Tab:Input({
 })
 
 local ResetInput = Tab:Input({
-    Title = "Reset Delay (Server Reset)",
-    Desc = "Delay sebelum fishing berikutnya",
+    Title = "Reset Delay",
     Value = tostring(ResetDelay),
     InputIcon = "clock",
     Type = "Input",
@@ -51,7 +56,6 @@ local Toggle = Tab:Toggle({
     Title = "Auto Fishing",
     Desc = "Toggle ON/OFF Auto Fishing",
     Icon = "fish",
-    Type = "Checkbox",
     Value = false,
     Callback = function(state)
         AutoFishing = state
@@ -88,7 +92,7 @@ local Toggle = Tab:Toggle({
 -- Tab
 local Tab = Window:Tab({
     Title = "Teleport",
-    Icon = "navigation",
+    Icon = "map-pin",
     Locked = false,
 })
 
@@ -148,4 +152,160 @@ Tab:Button({
         end
     end
 })
+
+local HUDEnabled = false
+
+-- Buat ScreenGui untuk Ping & FPS HUD
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PingFPSHUD"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Panel utama (compact)
+local Panel = Instance.new("Frame")
+Panel.Size = UDim2.new(0, 200, 0, 70)  -- compact lebar 200
+Panel.Position = UDim2.new(1, -210, 0, 10) -- pojok kanan atas
+Panel.BackgroundColor3 = Color3.fromHex("#101010")
+Panel.BackgroundTransparency = 0.2
+Panel.BorderSizePixel = 0
+Panel.AnchorPoint = Vector2.new(0,0)
+Panel.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = Panel
+
+-- Logo
+local Logo = Instance.new("ImageLabel")
+Logo.Size = UDim2.new(0, 30, 0, 30)
+Logo.Position = UDim2.new(0, 10, 0, 10)
+Logo.BackgroundTransparency = 1
+Logo.Image = "rbxassetid://104014041555704" -- ganti logo
+Logo.Parent = Panel
+
+-- Nama ZYQRIN
+local NameLabel = Instance.new("TextLabel")
+NameLabel.Size = UDim2.new(0, 120, 0, 30)
+NameLabel.Position = UDim2.new(0, 50, 0, 10)
+NameLabel.BackgroundTransparency = 1
+NameLabel.Font = Enum.Font.GothamBold
+NameLabel.TextSize = 18
+NameLabel.Text = "ZYQRIN"
+NameLabel.TextColor3 = Color3.fromHex("#00FF00")
+NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+NameLabel.Parent = Panel
+
+-- Garis pembatas horizontal
+local Separator = Instance.new("Frame")
+Separator.Size = UDim2.new(1, -20, 0, 2)
+Separator.Position = UDim2.new(0, 10, 0, 40)
+Separator.BackgroundColor3 = Color3.fromHex("#0078D7")
+Separator.BorderSizePixel = 0
+Separator.Parent = Panel
+
+-- Ping Label
+local PingLabel = Instance.new("TextLabel")
+PingLabel.Size = UDim2.new(0, 80, 0, 20)
+PingLabel.Position = UDim2.new(0, 10, 0, 45)
+PingLabel.BackgroundTransparency = 1
+PingLabel.Font = Enum.Font.GothamBold
+PingLabel.TextSize = 14
+PingLabel.TextColor3 = Color3.fromHex("#00FF00")
+PingLabel.TextXAlignment = Enum.TextXAlignment.Left
+PingLabel.Text = "Ping: 0 ms"
+PingLabel.Parent = Panel
+
+-- FPS Label
+local FPSLabel = Instance.new("TextLabel")
+FPSLabel.Size = UDim2.new(0, 80, 0, 20)
+FPSLabel.Position = UDim2.new(0, 110, 0, 45)
+FPSLabel.BackgroundTransparency = 1
+FPSLabel.Font = Enum.Font.GothamBold
+FPSLabel.TextSize = 14
+FPSLabel.TextColor3 = Color3.fromHex("#00FF00")
+FPSLabel.TextXAlignment = Enum.TextXAlignment.Left
+FPSLabel.Text = "FPS: 0"
+FPSLabel.Parent = Panel
+
+-- Ping bar animasi (di bawah ping)
+local PingBar = Instance.new("Frame")
+PingBar.Size = UDim2.new(0, 0, 0, 5)
+PingBar.Position = UDim2.new(0, 10, 1, -5)
+PingBar.BackgroundColor3 = Color3.fromHex("#00FF00")
+PingBar.BorderSizePixel = 0
+PingBar.Parent = Panel
+local PingBarUICorner = Instance.new("UICorner")
+PingBarUICorner.CornerRadius = UDim.new(0, 2)
+PingBarUICorner.Parent = PingBar
+
+-- Fungsi warna ping
+local function PingColor(ping)
+    if ping < 100 then
+        return Color3.fromHex("#00FF00")
+    elseif ping < 200 then
+        return Color3.fromHex("#FFFF00")
+    else
+        return Color3.fromHex("#FF0000")
+    end
+end
+
+-- Update FPS & Ping realtime
+spawn(function()
+    local pingValue = Stats.ServerStatsItem["Data Ping"]
+    local lastTime = tick()
+    local frameCount = 0
+    RunService.RenderStepped:Connect(function(delta)
+        if HUDEnabled then
+            frameCount += 1
+            local now = tick()
+            if now - lastTime >= 1 then
+                local fps = frameCount / (now - lastTime)
+                FPSLabel.Text = "FPS: "..math.floor(fps)
+                frameCount = 0
+                lastTime = now
+            end
+            local ping = math.floor(pingValue:GetValue())
+            PingLabel.Text = "Ping: "..ping.." ms"
+            PingLabel.TextColor3 = PingColor(ping)
+            PingBar.Size = UDim2.new(math.clamp(ping/300,0,1),0,0,5)
+            PingBar.BackgroundColor3 = PingColor(ping)
+            Panel.Visible = true
+        else
+            Panel.Visible = false
+        end
+    end)
+end)
+
+-- =========================================================
+
+local SetTab = Window:Tab({
+    Title = "Misc",
+    Icon = "settings",
+    Locked = false
+})
+
+
+local Button = SetTab:Button({
+    Title = "Auto Rejoin",
+    Desc = "Rejoin Server",
+    Locked = false,
+    Callback = function()
+        TeleportService:Teleport(PlaceId, LocalPlayer)
+        print(LocalPlayer.Name.." rejoining random server...")
+    end
+})
+
+SetTab:Space()
+
+local Toggle = SetTab:Toggle({
+    Title = "Ping & Fps Panel",
+    Desc = "On Ping & Fps Panel",
+    Icon = "bird",
+    Value = false, -- default value
+    Callback = function(state) 
+        HUDEnabled = state
+    end
+})
+
+
 
