@@ -94,7 +94,7 @@ local Tab = Window:Tab({
 
 -- Lokasi teleport
 local locations = {
-    ["Spawn"] = Vector3.new(0, 5, 0),
+    ["Spawn"] = Vector3.new(36.9, 9.9, 2810.6),
     ["Ancient Jungle"] = Vector3.new(1273.0, 7.8, -189.9),
     ["Ancient Jungle Outside"] = Vector3.new(1595.4, 6.6, -367.3),
     ["Ancient Ruin"] = Vector3.new(6089.1, -585.9, 4631.2),
