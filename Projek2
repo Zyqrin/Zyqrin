@@ -306,6 +306,3 @@ local Toggle = SetTab:Toggle({
         HUDEnabled = state
     end
 })
-
-
-
