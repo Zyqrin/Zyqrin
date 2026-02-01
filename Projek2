@@ -3,7 +3,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Zyqrin Hub",
-    Icon = "rbxassetid://109376207945079",
+    Icon = "rbxassetid://89080560824811",
     Author = "by zyqrin",
 })
 
@@ -213,7 +213,7 @@ local Logo = Instance.new("ImageLabel")
 Logo.Size = UDim2.new(0, 30, 0, 30)
 Logo.Position = UDim2.new(0, 10, 0, 10)
 Logo.BackgroundTransparency = 1
-Logo.Image = "rbxassetid://109376207945079" -- ganti logo
+Logo.Image = "rbxassetid://89080560824811" -- ganti logo
 Logo.Parent = Panel
 
 -- Nama ZYQRIN
