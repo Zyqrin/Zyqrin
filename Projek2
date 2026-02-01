@@ -83,3 +83,51 @@ local Toggle = Tab:Toggle({
         end
     end
 })
+
+
+-- Tab
+local Tab = Window:Tab({
+    Title = "Teleport",
+    Icon = "navigation",
+    Locked = false,
+})
+
+-- Lokasi teleport
+local locations = {
+    ["Spawn"] = Vector3.new(0, 5, 0),
+    ["Ancient Jungle"] = Vector3.new(1273.0, 7.8, -189.9),
+    ["Ancient Jungle Outside"] = Vector3.new(1595.4, 6.6, -367.3),
+    ["Ancient Ruin"] = Vector3.new(6089.1, -585.9, 4631.2),
+}
+
+local selectedLocation = "Spawn"
+
+-- Dropdown single-select (Wajib pakai Values dan Value)
+local Dropdown = Tab:Dropdown({
+    Title = "Pilih Lokasi",
+    Desc = "Pilih lokasi untuk teleport",
+    Values = {"Spawn", "Ancient Jungle", "Ancient Jungle Outside", "Ancient Ruin"}, -- semua nama lokasi
+    Value = "Spawn", -- default
+    Multi = false, -- hanya satu pilihan
+    Callback = function(option)
+        selectedLocation = option
+        print("Lokasi dipilih: " .. selectedLocation)
+    end
+})
+
+-- Tombol teleport
+Tab:Button({
+    Title = "Teleport Sekarang",
+    Description = "Klik untuk teleport ke lokasi yang dipilih",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if locations[selectedLocation] then
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(locations[selectedLocation])
+            else
+                warn("Lokasi tidak valid!")
+            end
+        end
+    end
+})
+
