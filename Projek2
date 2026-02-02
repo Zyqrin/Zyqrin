@@ -14,7 +14,7 @@ local MainTab = Window:Tab({
 })
 
 local InstanSection = MainTab:Section({
-    Title = "Instan",
+    Title = "Instan Fishing",
     Box = true,
     Opened = false,
 })
