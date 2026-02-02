@@ -218,6 +218,56 @@ SellSection:Toggle({
     end
 })
 
+local SellAll = RS.Packages._Index["sleitnick_net@0.2.0"].net["RF/SellAllItems"]
+
+local AutoSell = false
+local SellInterval = 60 -- default 1 menit
+local LastSell = 0
+
+--================================
+-- LOOP
+--================================
+task.spawn(function()
+    while task.wait(1) do
+        if AutoSell then
+            if os.time() - LastSell >= SellInterval then
+                LastSell = os.time()
+                pcall(function()
+                    SellAll:InvokeServer()
+                end)
+            end
+        end
+    end
+end)
+
+--================================
+-- UI
+--================================
+SellSection:Toggle({
+    Title = "Sell All Time",
+    Desc = "Auto sell pakai timer",
+    Value = false,
+    Callback = function(v)
+        AutoSell = v
+        if v then
+            LastSell = os.time()
+        end
+    end
+})
+
+SellSection:Input({
+    Title = "Sell Interval (detik)",
+    Desc = "60 = 1 menit | 3600 = 1 jam",
+    Placeholder = "60",
+    Callback = function(v)
+        local num = tonumber(v)
+        if num and num >= 5 then
+            SellInterval = num
+        end
+    end
+})
+
+
 
 -- Tab
 local TpTab = Window:Tab({
