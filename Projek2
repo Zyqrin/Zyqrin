@@ -7,11 +7,18 @@ local Window = WindUI:CreateWindow({
     Author = "by zyqrin",
 })
 
-local Tab = Window:Tab({
+local MainTab = Window:Tab({
     Title = "Main",
     Icon = "fish",
     Locked = false,
 })
+
+local InstanSection = MainTab:Section({
+    Title = "Instan",
+    Box = true,
+    Opened = false,
+})
+
 
 -- ===== VARIABLES =====
 local RS = game:GetService("ReplicatedStorage")
@@ -29,7 +36,7 @@ local PullDelay = 0.5
 local ResetDelay = .0
 
 -- ===== INPUT BOXES =====
-local PullInput = Tab:Input({
+InstanSection:Input({
     Title = "Pull Delay",
     Value = tostring(PullDelay),
     InputIcon = "clock",
@@ -40,7 +47,7 @@ local PullInput = Tab:Input({
     end
 })
 
-local ResetInput = Tab:Input({
+InstanSection:Input({
     Title = "Reset Delay",
     Value = tostring(ResetDelay),
     InputIcon = "clock",
@@ -52,7 +59,7 @@ local ResetInput = Tab:Input({
 })
 
 -- ===== TOGGLE AUTO FISHING =====
-local Toggle = Tab:Toggle({
+InstanSection:Toggle({
     Title = "Auto Fishing",
     Desc = "Toggle ON/OFF Auto Fishing",
     Icon = "fish",
@@ -88,6 +95,92 @@ local Toggle = Tab:Toggle({
     end
 })
 
+local ChargeRod = RS.Packages._Index["sleitnick_net@0.2.0"].net["RF/ChargeFishingRod"]
+local StartMini = RS.Packages._Index["sleitnick_net@0.2.0"].net["RF/RequestFishingMinigameStarted"]
+local FinishFish = RS.Packages._Index["sleitnick_net@0.2.0"].net["RE/FishingCompleted"]
+local CancelFish = RS.Packages._Index["sleitnick_net@0.2.0"].net["RF/CancelFishingInputs"]
+
+
+--================================
+-- STATE
+--================================
+local Auto = false
+local CompleteDelay = 0.7
+local ResetTimer = 0.3
+
+--================================
+-- TRUE 0 DELAY HANDLER
+--================================
+local function smartWait(t)
+    if t <= 0 then
+        task.wait() -- next frame (REAL 0 delay feel)
+    else
+        task.wait(t)
+    end
+end
+
+--================================
+-- CORE LOOP
+--================================
+task.spawn(function()
+    while true do
+        if Auto then
+            -- lempar umpan
+            ChargeRod:InvokeServer(2)
+
+            -- start minigame
+            StartMini:InvokeServer(-1.25, 1)
+
+            -- nunggu sebelum tarik
+            smartWait(CompleteDelay)
+
+            -- tarik ikan
+            FinishFish:FireServer()
+
+            -- reset biar ga nyangkut
+            CancelFish:InvokeServer()
+        end
+
+        smartWait(ResetTimer)
+    end
+end)
+
+
+local BlatanSection = MainTab:Section({
+    Title = "Blatan V1",
+    Box = true,
+    Opened = false,
+})
+--================================
+-- UI (BISA 0)
+--================================
+BlatanSection:Toggle({
+    Title = "Blatan V1",
+    Value = false,
+    Locked = true,
+    Callback = function(v)
+        Auto = v
+    end
+})
+
+BlatanSection:Input({
+    Title = "Complete Delay",
+    Placeholder = "0.7",
+    Locked = true,
+    Callback = function(v)
+        CompleteDelay = tonumber(v) or CompleteDelay
+    end
+})
+
+BlatanSection:Input({
+    Title = "Reset Timer (boleh 0)",
+    Placeholder = "0.3",
+    Locked = true,
+    Callback = function(v)
+        ResetTimer = tonumber(v) or ResetTimer
+    end
+})
+
 
 -- ===== VARIABLES =====
 local AutoSellInstant = false
@@ -99,10 +192,14 @@ local function SellAll()
     end)
 end
 
-Tab:Space()
+local SellSection = MainTab:Section({
+    Title = "Sell",
+    Box = true,
+    Opened = false,
+})
 
 -- ===== TOGGLE AUTO SELL INSTANT =====
-Tab:Toggle({
+SellSection:Toggle({
     Title = "Auto Sell Instan",
     Desc = "Sell All Instan",
     Icon = "zap",
@@ -123,10 +220,16 @@ Tab:Toggle({
 
 
 -- Tab
-local Tab = Window:Tab({
+local TpTab = Window:Tab({
     Title = "Teleport",
     Icon = "map-pin",
     Locked = false,
+})
+
+local TpSection = TpTab:Section({
+    Title = "Teleport",
+    Box = true,
+    Opened = false,
 })
 
 -- Lokasi teleport
@@ -158,7 +261,7 @@ local locations = {
 local selectedLocation = "Spawn"
 
 -- Dropdown single-select (Wajib pakai Values dan Value)
-local Dropdown = Tab:Dropdown({
+TpSection:Dropdown({
     Title = "Pilih Lokasi",
     Desc = "Pilih lokasi untuk teleport",
     Values = {"Spawn", "Ancient Jungle", "Ancient Jungle Outside", "Ancient Ruin","Coral Reefs","Crater Island Ground","Crystal Depths","Crystaline Pessage","Esoteric Deep","Kohana","Kohana Volcano","Leviathan Den","Pirate Cove","Pirate Treasure Room","Secred Temple","Secret Pessage","Sisyphus Statue","Treasure Room","Tropical Grove","Underground Cellar","Volcanic Cavern","Weather Machine",}, -- semua nama lokasi
@@ -171,7 +274,7 @@ local Dropdown = Tab:Dropdown({
 })
 
 -- Tombol teleport
-Tab:Button({
+TpSection:Button({
     Title = "Teleport Sekarang",
     Description = "Klik untuk teleport ke lokasi yang dipilih",
     Callback = function()
@@ -223,7 +326,7 @@ NameLabel.Position = UDim2.new(0, 50, 0, 10)
 NameLabel.BackgroundTransparency = 1
 NameLabel.Font = Enum.Font.GothamBold
 NameLabel.TextSize = 18
-NameLabel.Text = "ZYQRIN"
+NameLabel.Text = "ZYQRIN PANEL"
 NameLabel.TextColor3 = Color3.fromHex("#00FF00")
 NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 NameLabel.Parent = Panel
@@ -318,7 +421,13 @@ local SetTab = Window:Tab({
 })
 
 
-local Button = SetTab:Button({
+local RejoinSection = SetTab:Section({
+    Title = "Auto rejoin",
+    Box = true,
+    Opened = false,
+})
+
+RejoinSection:Button({
     Title = "Auto Rejoin",
     Desc = "Rejoin Server",
     Locked = false,
@@ -328,9 +437,13 @@ local Button = SetTab:Button({
     end
 })
 
-SetTab:Space()
+local StSection = SetTab:Section({
+    Title = "settings",
+    Box = true,
+    Opened = false,
+})
 
-local Toggle = SetTab:Toggle({
+StSection:Toggle({
     Title = "Ping & Fps Panel",
     Desc = "On Ping & Fps Panel",
     Icon = "bird",
