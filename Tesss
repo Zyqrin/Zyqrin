@@ -1,30 +1,21 @@
--------------------------------------------------
+--------------------------------------------------
 -- PANDA DEVELOPMENT CONFIG
--------------------------------------------------
+--------------------------------------------------
 local PANDA_API_KEY = "0da4700e-6a8a-4894-b920-cd286eb8c343"
-
--------------------------------------------------
--- SERVICES
--------------------------------------------------
 local HttpService = game:GetService("HttpService")
 local Analytics = game:GetService("RbxAnalyticsService")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
 
--------------------------------------------------
--- STATE
--------------------------------------------------
 local isPremium = false
 local expiryText = "N/A"
-
--------------------------------------------------
--- GET USER KEY & HWID
--------------------------------------------------
-local USER_KEY = getgenv().PANDA_KEY
+local USER_KEY = getgenv().PANDA_KEY or ""
 local HWID = Analytics:GetClientId()
 
--------------------------------------------------
--- VALIDATE KEY (ONLY IF EXISTS)
--------------------------------------------------
-if USER_KEY and USER_KEY ~= "" then
+-- VALIDASI KEY PANDA
+if USER_KEY ~= "" then
     local success, response = pcall(function()
         return HttpService:PostAsync(
             "https://api.pandadevelopment.net/v1/validate",
@@ -36,7 +27,6 @@ if USER_KEY and USER_KEY ~= "" then
             Enum.HttpContentType.ApplicationJson
         )
     end)
-
     if success then
         local data = HttpService:JSONDecode(response)
         if data.valid == true then
@@ -46,94 +36,228 @@ if USER_KEY and USER_KEY ~= "" then
     end
 end
 
--------------------------------------------------
+--------------------------------------------------
 -- LOAD WINDUI
--------------------------------------------------
+--------------------------------------------------
 local WindUI = loadstring(game:HttpGet(
     "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
 ))()
 
 local Window = WindUI:CreateWindow({
-    Title = "Zyqrin Hub",
-    Icon = "lock",
-    Author = isPremium and ("Premium 💎 | "..expiryText) or "Free 🆓"
+    Title = "Zyqrin Hub || ETFB",
+    Icon = "rbxassetid://73349555895759",
+    Author = isPremium and ("Premium 💎 | "..expiryText) or "Free 🆓",
 })
 
-local Tab = Window:Tab({
-    Title = "Features",
-    Icon = "star"
+Window:Tag({
+    Title = "v1.0",
+    Icon = "rocket",
+    Color = Color3.fromHex("#30ff6a"),
+    Radius = 13,
 })
 
--------------------------------------------------
--- FREE FEATURE (SEMUA BISA)
--------------------------------------------------
-Tab:Toggle({
-    Title = "Free Toggle Example",
-    Desc = "Bisa dipakai semua user",
-    Value = false,
-    Callback = function(v)
-        print("Free Toggle:", v)
+local MainTab = Window:Tab({ Title = "Main", Icon = "tool-case" })
+local MenuTab = Window:Tab({ Title = "Upgrade", Icon = "shopping-cart" })
+local BaseTab = Window:Tab({ Title = "Base", Icon = "house" })
+local EventTab = Window:Tab({ Title = "Event", Icon = "fan" })
+
+--------------------------------------------------
+-- STATE SCRIPT (EXISTING)
+--------------------------------------------------
+local Zones = {
+    ["Base"]   = Vector3.new(137.6, 3.2, 24.1),
+    ["Zone 1"] = Vector3.new(200.0, -4.3, 0.0),
+    ["Zone 2"] = Vector3.new(284.9, -4.3, 1.1),
+    ["Zone 3"] = Vector3.new(403.3, -4.3, 7.0),
+    ["Zone 4"] = Vector3.new(536.4, -4.3, 8.5),
+    ["Zone 5"] = Vector3.new(757.9, -4.3, 8.2),
+    ["Zone 6"] = Vector3.new(1067.2, -4.3, 7.9),
+    ["Zone 7"] = Vector3.new(1535.8, -4.3, 2.4),
+    ["Zone 8"] = Vector3.new(2253.7, -4.3, 35.3),
+    ["Zone 9"] = Vector3.new(2609.2, -4.3, -17.6),
+}
+local ZoneOrder = {"Base","Zone 1","Zone 2","Zone 3","Zone 4","Zone 5","Zone 6","Zone 7","Zone 8","Zone 9"}
+local BrainrotRoot = workspace:WaitForChild("ActiveBrainrots")
+local SelectedVariants = { Common = true }
+
+local UpgradeSpeed = ReplicatedStorage.RemoteFunctions:WaitForChild("UpgradeSpeed")
+local UpgradeCarry = ReplicatedStorage.RemoteFunctions:WaitForChild("UpgradeCarry")
+local RebirthRemote = ReplicatedStorage.RemoteFunctions:WaitForChild("Rebirth")
+local SellRemote = ReplicatedStorage.RemoteFunctions:WaitForChild("SellAll")
+
+local CurrentIndex = 1
+local Moving = false
+local BusyTake = false
+local AutoSpeed = false
+local AutoCarry = false
+local AutoRebirth = false
+local SpeedAmount = 10
+local AutoSell = false
+
+--------------------------------------------------
+-- CHARACTER UTILS
+--------------------------------------------------
+local function getChar()
+    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+end
+local function getHRP()
+    return getChar():WaitForChild("HumanoidRootPart")
+end
+
+--------------------------------------------------
+-- SMOOTH MOVE
+--------------------------------------------------
+local function smoothMoveTo(position)
+    local hrp = getHRP()
+    local targetCF = CFrame.new(position + Vector3.new(0, 2, 0))
+    local dist = (hrp.Position - position).Magnitude
+    local time = math.clamp(dist * 0.01, 0.12, 0.6)
+    local tween = TweenService:Create(hrp, TweenInfo.new(time, Enum.EasingStyle.Linear), {CFrame = targetCF})
+    tween:Play()
+    tween.Completed:Wait()
+end
+
+--------------------------------------------------
+-- DETECT ZONE
+--------------------------------------------------
+local function detectCurrentZone()
+    local hrp = getHRP()
+    local closest, idx = math.huge, 1
+    for i, name in ipairs(ZoneOrder) do
+        local d = (hrp.Position - Zones[name]).Magnitude
+        if d < closest then closest, idx = d, i end
     end
-})
-
--------------------------------------------------
--- PREMIUM SECTION
--------------------------------------------------
-Tab:Section({
-    Title = "Premium Toggles"
-})
-
--------------------------------------------------
--- FREE USER (LIHAT SAJA, TERKUNCI)
--------------------------------------------------
-if not isPremium then
-    Tab:Label({
-        Text = "🔒 Auto Farm (Premium)"
-    })
-    Tab:Label({
-        Text = "🔒 Auto Hit (Premium)"
-    })
-    Tab:Label({
-        Text = "🔒 Auto Teleport (Premium)"
-    })
+    CurrentIndex = idx
 end
 
--------------------------------------------------
--- PREMIUM USER (TOGGLE ASLI)
--------------------------------------------------
+--------------------------------------------------
+-- STEP ZONE
+--------------------------------------------------
+local function stepForward()
+    if Moving or BusyTake then return end
+    Moving = true
+    detectCurrentZone()
+    if CurrentIndex < #ZoneOrder then
+        CurrentIndex += 1
+        smoothMoveTo(Zones[ZoneOrder[CurrentIndex]])
+    end
+    Moving = false
+end
+local function stepBackward()
+    if Moving or BusyTake then return end
+    Moving = true
+    detectCurrentZone()
+    if CurrentIndex > 1 then
+        CurrentIndex -= 1
+        smoothMoveTo(Zones[ZoneOrder[CurrentIndex]])
+    end
+    Moving = false
+end
+
+--------------------------------------------------
+-- TAKE BRAINROT
+--------------------------------------------------
+local function takeBrainrotOnce()
+    if BusyTake or Moving then return end
+    BusyTake = true
+    local returnPos = getHRP().Position
+    for _, variant in pairs(BrainrotRoot:GetChildren()) do
+        if SelectedVariants[variant.Name] then
+            local rendered = variant:FindFirstChild("RenderedBrainrot")
+            if rendered then
+                local root = rendered:FindFirstChild("Root")
+                if root then
+                    local prompt = root:FindFirstChild("TakePrompt", true)
+                    if prompt then
+                        smoothMoveTo(root.Position)
+                        task.wait(0.15)
+                        fireproximityprompt(prompt)
+                        task.wait(0.2)
+                        smoothMoveTo(returnPos)
+                    end
+                end
+            end
+        end
+    end
+    BusyTake = false
+end
+
+--------------------------------------------------
+-- RESET ON DEATH
+--------------------------------------------------
+LocalPlayer.CharacterAdded:Connect(function(char)
+    char:WaitForChild("Humanoid").Died:Connect(function()
+        CurrentIndex = 1
+    end)
+end)
+
+--------------------------------------------------
+-- AUTO LOOPS
+--------------------------------------------------
+task.spawn(function() while task.wait(0.6) do if AutoSpeed then pcall(function() UpgradeSpeed:InvokeServer(SpeedAmount) end) end end end)
+task.spawn(function() while task.wait(0.8) do if AutoCarry then pcall(function() UpgradeCarry:InvokeServer() end) end end end)
+task.spawn(function() while task.wait(2) do if AutoRebirth then pcall(function() RebirthRemote:InvokeServer() end) end end end)
+task.spawn(function() while task.wait(1.2) do if AutoSell then pcall(function() SellRemote:InvokeServer() end) end end end)
+
+--------------------------------------------------
+-- UI : MAIN
+--------------------------------------------------
+local ManualSection = MainTab:Section({Title="MANUAL",Box=true,Opened=false})
+ManualSection:Button({Title="Tp Zone",Desc="Speed wajib 150+",Icon="arrow-big-up",Callback=stepForward})
+ManualSection:Button({Title="To Base",Desc="Speed wajib 150+",Icon="arrow-big-down",Callback=stepBackward})
+ManualSection:Button({Title="Take Brainrot",Desc="Klik untuk ambil Brainrot aktif",Icon="plane-takeoff",Callback=takeBrainrotOnce})
+ManualSection:Dropdown({Title="Brainrot Variant",Desc="Pilih rarity",Values={"Celestial","Common","Cosmic","Epic","Legendary","Mythical","Rare","Secret","Uncomman"},Value={"Celestial"},Multi=true,AllowNone=true,Callback=function(opts) SelectedVariants={} for _,v in pairs(opts) do SelectedVariants[v]=true end end})
+
+ManualSection:Section({Title="OTOMATIS [COMING SOON]",Box=true,Opened=false})
+
+-- PREMIUM TOGGLES
 if isPremium then
-    Tab:Toggle({
-        Title = "Auto Farm",
-        Desc = "Premium Toggle",
-        Value = false,
-        Callback = function(v)
-            print("Auto Farm:", v)
-        end
-    })
-
-    Tab:Toggle({
-        Title = "Auto Hit",
-        Desc = "Premium Toggle",
-        Value = false,
-        Callback = function(v)
-            print("Auto Hit:", v)
-        end
-    })
-
-    Tab:Toggle({
-        Title = "Auto Teleport",
-        Desc = "Premium Toggle",
-        Value = false,
-        Callback = function(v)
-            print("Auto Teleport:", v)
-        end
-    })
+    ManualSection:Toggle({Title="Auto Main",Desc="Main Otomatis",Icon="bird",Value=false,Callback=function(state) print("Toggle Activated "..tostring(state)) end})
+    ManualSection:Dropdown({Title="Zone",Desc="Pilih",Values={"Celestial","Cosmic","Common"},Value={"Celestial"},Multi=true,AllowNone=true,Callback=function(option) print("Categories selected: "..HttpService:JSONEncode(option)) end})
+else
+    -- FREE user: lihat saja tapi terkunci
+    ManualSection:Label({Text="🔒 Auto Main (Premium)"})
+    ManualSection:Label({Text="🔒 Pilih Zone (Premium)"})
 end
 
--------------------------------------------------
+--------------------------------------------------
+-- UI : UPGRADE
+--------------------------------------------------
+local UpgradeSection = MenuTab:Section({Title="Upgrade",Box=true,Opened=false})
+UpgradeSection:Toggle({Title="Auto Upgrade Speed",Value=false,Callback=function(v) AutoSpeed=v end})
+UpgradeSection:Dropdown({Title="Speed Amount",Values={"1","5","10"},Value="10",Multi=false,AllowNone=false,Callback=function(v) SpeedAmount=tonumber(v) end})
+UpgradeSection:Toggle({Title="Auto Upgrade Carry",Value=false,Callback=function(v) AutoCarry=v end})
+
+local RebirthSection = MenuTab:Section({Title="Auto Rebirth",Box=true,Opened=false})
+RebirthSection:Toggle({Title="Auto Rebirth",Value=false,Callback=function(v) AutoRebirth=v end})
+
+local SellSection = MenuTab:Section({Title="Sell",Box=true,Opened=false})
+SellSection:Toggle({Title="Auto Sell",Desc="Menjual semua item otomatis",Value=false,Callback=function(v) AutoSell=v end})
+
+--------------------------------------------------
+-- UI : BASE
+--------------------------------------------------
+local BaseSection = BaseTab:Section({Title="Base [COMING SOON]",Box=true,Opened=false})
+if isPremium then
+    BaseSection:Toggle({Title="Auto Collect",Value=false,Callback=function(v) end})
+    BaseSection:Toggle({Title="Auto Upgrade",Value=false,Callback=function(v) end})
+else
+    BaseSection:Label({Text="🔒 Auto Collect (Premium)"})
+    BaseSection:Label({Text="🔒 Auto Upgrade (Premium)"})
+end
+
+--------------------------------------------------
+-- UI : EVENT
+--------------------------------------------------
+local EventSection = EventTab:Section({Title="Event [COMING SOON]",Box=true,Opened=false})
+if isPremium then
+    EventSection:Toggle({Title="Auto Collect Gold",Value=false,Callback=function(v) end})
+else
+    EventSection:Label({Text="🔒 Auto Collect Gold (Premium)"})
+end
+
+--------------------------------------------------
 -- STATUS
--------------------------------------------------
-Tab:Section({ Title = "Status" })
-Tab:Label({
-    Text = isPremium and "Status: PREMIUM 💎" or "Status: FREE 🆓 (Locked)"
-})
+--------------------------------------------------
+local StatusTab = Window:Tab({Title="Status",Icon="info"})
+StatusTab:Label({Text=isPremium and "Status: PREMIUM 💎" or "Status: FREE 🆓 (Locked)"})
