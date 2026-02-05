@@ -1,9 +1,49 @@
-PREMIUM CHECK (LUARMOR)
+-------------------------------------------------
+-- PANDA DEVELOPMENT CONFIG
+-------------------------------------------------
+local PANDA_API_KEY = "0da4700e-6a8a-4894-b920-cd286eb8c343"
+
+-------------------------------------------------
+-- SERVICES
+-------------------------------------------------
+local HttpService = game:GetService("HttpService")
+local Analytics = game:GetService("RbxAnalyticsService")
+
+-------------------------------------------------
+-- STATE
 -------------------------------------------------
 local isPremium = false
+local expiryText = "N/A"
 
-if getgenv().script_key ~= nil then
-    isPremium = true
+-------------------------------------------------
+-- GET USER KEY & HWID
+-------------------------------------------------
+local USER_KEY = getgenv().PANDA_KEY
+local HWID = Analytics:GetClientId()
+
+-------------------------------------------------
+-- VALIDATE KEY (ONLY IF EXISTS)
+-------------------------------------------------
+if USER_KEY and USER_KEY ~= "" then
+    local success, response = pcall(function()
+        return HttpService:PostAsync(
+            "https://api.pandadevelopment.net/v1/validate",
+            HttpService:JSONEncode({
+                api_key = PANDA_API_KEY,
+                license = USER_KEY,
+                hwid = HWID
+            }),
+            Enum.HttpContentType.ApplicationJson
+        )
+    end)
+
+    if success then
+        local data = HttpService:JSONDecode(response)
+        if data.valid == true then
+            isPremium = true
+            expiryText = data.expires or "Lifetime"
+        end
+    end
 end
 
 -------------------------------------------------
@@ -14,69 +54,86 @@ local WindUI = loadstring(game:HttpGet(
 ))()
 
 local Window = WindUI:CreateWindow({
-    Title = "My Super Hub",
+    Title = "Zyqrin Hub",
     Icon = "lock",
-    Author = isPremium and "Premium 💎" or "Free 🆓"
+    Author = isPremium and ("Premium 💎 | "..expiryText) or "Free 🆓"
 })
 
-local FreeTab = Window:Tab({
-    Title = "Main Features",
+local Tab = Window:Tab({
+    Title = "Features",
     Icon = "star"
 })
 
 -------------------------------------------------
 -- FREE FEATURE (SEMUA BISA)
 -------------------------------------------------
-FreeTab:Button({
-    Title = "Free Feature",
+Tab:Toggle({
+    Title = "Free Toggle Example",
     Desc = "Bisa dipakai semua user",
-    Callback = function()
-        print("Free feature jalan")
+    Value = false,
+    Callback = function(v)
+        print("Free Toggle:", v)
     end
 })
 
 -------------------------------------------------
--- PREMIUM FEATURES
+-- PREMIUM SECTION
 -------------------------------------------------
-local PremSection = FreeTab:Section({ 
-    Title = "Section",
-    Box = true,
-    Opened = flase,
+Tab:Section({
+    Title = "Premium Toggles"
 })
 
--- 🔒 FREE USER → CUMA LIHAT
+-------------------------------------------------
+-- FREE USER (LIHAT SAJA, TERKUNCI)
+-------------------------------------------------
 if not isPremium then
-    Tab:Label({ Text = "🔒 Premium Auto Farm" })
-    Tab:Label({ Text = "🔒 Premium Auto Hit" })
-    Tab:Label({ Text = "🔒 Premium Teleport" })
-    Tab:Label({ Text = "💎 Buy Premium to Unlock" })
+    Tab:Label({
+        Text = "🔒 Auto Farm (Premium)"
+    })
+    Tab:Label({
+        Text = "🔒 Auto Hit (Premium)"
+    })
+    Tab:Label({
+        Text = "🔒 Auto Teleport (Premium)"
+    })
 end
 
--- 💎 PREMIUM USER → AKTIF
+-------------------------------------------------
+-- PREMIUM USER (TOGGLE ASLI)
+-------------------------------------------------
 if isPremium then
-    PremSection:Toggle({
+    Tab:Toggle({
         Title = "Auto Farm",
-        Desc = "Premium Feature",
+        Desc = "Premium Toggle",
         Value = false,
         Callback = function(v)
             print("Auto Farm:", v)
         end
     })
 
-    PremSection:Toggle({
+    Tab:Toggle({
         Title = "Auto Hit",
-        Desc = "Premium Feature",
+        Desc = "Premium Toggle",
         Value = false,
         Callback = function(v)
             print("Auto Hit:", v)
         end
     })
 
-    PremSection:Button({
-        Title = "Teleport Secret Area",
-        Desc = "Premium Feature",
-        Callback = function()
-            print("Teleport jalan")
+    Tab:Toggle({
+        Title = "Auto Teleport",
+        Desc = "Premium Toggle",
+        Value = false,
+        Callback = function(v)
+            print("Auto Teleport:", v)
         end
     })
 end
+
+-------------------------------------------------
+-- STATUS
+-------------------------------------------------
+Tab:Section({ Title = "Status" })
+Tab:Label({
+    Text = isPremium and "Status: PREMIUM 💎" or "Status: FREE 🆓 (Locked)"
+})
