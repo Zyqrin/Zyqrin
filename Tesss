@@ -1,0 +1,82 @@
+PREMIUM CHECK (LUARMOR)
+-------------------------------------------------
+local isPremium = false
+
+if getgenv().script_key ~= nil then
+    isPremium = true
+end
+
+-------------------------------------------------
+-- LOAD WINDUI
+-------------------------------------------------
+local WindUI = loadstring(game:HttpGet(
+    "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
+))()
+
+local Window = WindUI:CreateWindow({
+    Title = "My Super Hub",
+    Icon = "lock",
+    Author = isPremium and "Premium 💎" or "Free 🆓"
+})
+
+local FreeTab = Window:Tab({
+    Title = "Main Features",
+    Icon = "star"
+})
+
+-------------------------------------------------
+-- FREE FEATURE (SEMUA BISA)
+-------------------------------------------------
+FreeTab:Button({
+    Title = "Free Feature",
+    Desc = "Bisa dipakai semua user",
+    Callback = function()
+        print("Free feature jalan")
+    end
+})
+
+-------------------------------------------------
+-- PREMIUM FEATURES
+-------------------------------------------------
+local PremSection = FreeTab:Section({ 
+    Title = "Section",
+    Box = true,
+    Opened = flase,
+})
+
+-- 🔒 FREE USER → CUMA LIHAT
+if not isPremium then
+    Tab:Label({ Text = "🔒 Premium Auto Farm" })
+    Tab:Label({ Text = "🔒 Premium Auto Hit" })
+    Tab:Label({ Text = "🔒 Premium Teleport" })
+    Tab:Label({ Text = "💎 Buy Premium to Unlock" })
+end
+
+-- 💎 PREMIUM USER → AKTIF
+if isPremium then
+    PremSection:Toggle({
+        Title = "Auto Farm",
+        Desc = "Premium Feature",
+        Value = false,
+        Callback = function(v)
+            print("Auto Farm:", v)
+        end
+    })
+
+    PremSection:Toggle({
+        Title = "Auto Hit",
+        Desc = "Premium Feature",
+        Value = false,
+        Callback = function(v)
+            print("Auto Hit:", v)
+        end
+    })
+
+    PremSection:Button({
+        Title = "Teleport Secret Area",
+        Desc = "Premium Feature",
+        Callback = function()
+            print("Teleport jalan")
+        end
+    })
+end
